@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  dev:
+    build: .
+    container_name: node-server
+    volumes:
+      - ..:/home/node
+    stdin_open: true
+    tty: true
+    networks:
+      - codeable-net
+    command: /bin/bash
+    ports:
+      - "3000:3000"
+
+  db:
+    image: postgres:15
+    container_name: codeabledb
+    ports:
+      - 5432:5432
+    networks:
+      - codeable-net
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD=supersecret
+      - POSTGRES_USER=codeable
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - codeable-db:/var/lib/postgresql/data:rw
+volumes:
+  codeable-db:
+
+networks:
+  codeable-net:
+    driver: bridge

@@ -11,9 +11,12 @@ export class UserService {
 
     constructor (private userRepository: UserRepository){}
 
-    async getUsers():Promise<User[]|null>{
-        await this.userRepository.getUsers()
-        return null
+    async getUsers():Promise<User[]>{
+        return await this.userRepository.getUsers()
+    }
+
+    async getUserById(id: string): Promise<User| null>{
+        return await this.getUserById(id)
     }
 }
 
