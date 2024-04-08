@@ -66,6 +66,23 @@ class UserController {
             }
         })
     }
+
+    async deleteUser(req: http.IncomingMessage, res: http.ServerResponse) {
+        const id = String(req.url).split("/").pop()
+        const err = await this.userService.deleteUser(String(id))
+
+        if (err === null) {
+            res.writeHead(204, { "Content-Type": "application/json" })
+            res.write(JSON.stringify({ message: "User se elmino correctamente" }))
+            res.end()
+            return
+        }
+        res.writeHead(400, { "Content-Type": "application/json" })
+        res.write(JSON.stringify({ message: err }))
+        res.end()
+        return
+
+    }
 }
 
 

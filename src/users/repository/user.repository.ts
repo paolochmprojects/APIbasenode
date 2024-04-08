@@ -2,6 +2,7 @@ import { Client } from "pg";
 import db from "../../database/database";
 import { UserDTO } from "../user.controller";
 
+
 export class UserRepository {
     constructor(private client: Client){}
 
@@ -21,6 +22,16 @@ export class UserRepository {
             "INSERT INTO users (name, email, role, rate) VALUES ($1, $2, $3, $4) RETURNING id",
              [data.name, data.email, data.role, String(data.rate)])
         return result.rows[0]["id"]
+    }
+
+    async deleteUser(id:string){
+        const reuslt = await this.client.query(
+            "DELETE FROM users WHERE id = $1",
+            [id]
+        )
+        if (reuslt.rowCount === 0){
+            throw new Error("User not found")
+        }
     }
 }
 

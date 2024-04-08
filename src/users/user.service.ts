@@ -28,7 +28,16 @@ export class UserService {
             if (err instanceof Error) return err.message
             return "Ocurrio algo."
         }
-        
+    }
+
+    async deleteUser(id:string){
+        try {
+            await this.userRepository.deleteUser(id)
+            return null
+        } catch (err){
+            if (err instanceof Error) return err.message
+            return "Ocurrio algo."
+        }
     }
 }
 
