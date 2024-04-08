@@ -2,7 +2,10 @@ import { Client } from "pg"
 import settings from "../config/settings"
 
 class Database {
-    client: Client
+    private client: Client
+
+    // postgres://user:password@localhost:5432/dbname  --> connectionString
+
     constructor(connectionString: string){
         this.client = new Client({connectionString})
     }
@@ -16,7 +19,10 @@ class Database {
         await this.client.end()
         console.log("La base de datos se desconecto correctamente.")
     }
-}
 
+    getClient():Client{
+        return this.client
+    }
+}
 
 export default new Database(settings.DB_URL)
