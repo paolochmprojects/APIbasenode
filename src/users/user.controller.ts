@@ -23,9 +23,9 @@ class UserController {
         const id = String(req.url).split("/").pop()
         const user = await this.userService.getUserById(String(id))
 
-        if (!user) {
+        if (typeof user === "string") {
             res.writeHead(400, { "Content-Type": "application/json" })
-            res.write(JSON.stringify({ massage: "User not found" }))
+            res.write(JSON.stringify({ massage: user }))
             res.end()
             return
         }
@@ -47,6 +47,42 @@ class UserController {
                 if (err === null) {
                     res.writeHead(201, { "Content-Type": "application/json" })
                     res.write(JSON.stringify({ message: "User se creo correctamente" }))
+                    res.end()
+                    return
+                }
+                res.writeHead(400, { "Content-Type": "application/json" })
+                res.write(JSON.stringify({ message: err }))
+                res.end()
+                return
+
+
+            } catch (err) {
+                if (err instanceof Error) {
+                    res.writeHead(500, { "Content-Type": "application/json" })
+                    res.write(JSON.stringify({ message: `Error: ${err.message}` }))
+                    res.end()
+                    return
+                }
+            }
+        })
+    }
+
+    async updateUser (req: http.IncomingMessage, res: http.ServerResponse){
+
+        const id = String(req.url).split("/").pop()
+
+        let data = ""
+        req.on("data", (chunk) => {
+            data += chunk
+        })
+
+        req.on("end", async () => {
+            try {
+                const jsonData = JSON.parse(data) as UserDTO;
+                const err = await this.userService.updateUser(String(id), jsonData)
+                if (err === null) {
+                    res.writeHead(200, { "Content-Type": "application/json" })
+                    res.write(JSON.stringify({ message: "User se actualizo correctamente" }))
                     res.end()
                     return
                 }

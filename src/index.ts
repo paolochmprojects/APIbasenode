@@ -8,7 +8,6 @@ const requestListener: http.RequestListener = async (
     res: http.ServerResponse
 ) => {
     
-    // simple logger.
     console.log(`${req.method} ${new Date()} ${req.url}`)
     
     if (req.method === "GET" && req.url === "/users/"){
@@ -23,12 +22,14 @@ const requestListener: http.RequestListener = async (
         return await userController.getUsersById(req, res)
     }
 
+    if (req.method === "PUT" && reg.test(String(req.url))){
+        return await userController.updateUser(req, res)
+    }
+
     if ( req.method === "DELETE" && reg.test(String(req.url))){
         return await userController.deleteUser(req, res)
     }
 
-
-    // TODO: refactorizar logica de response.
     res.writeHead(404,{ "Content-Type": "application/json" })
     res.write(JSON.stringify({message:"Not found"}))
     res.end()
