@@ -8,6 +8,9 @@ const requestListener: http.RequestListener = async (
     res: http.ServerResponse
 ) => {
     
+    // simple logger.
+    console.log(`${req.method} ${new Date()} ${req.url}`)
+    
     if (req.method === "GET" && req.url === "/users/"){
         return userController.getUsers(req, res)
     }
@@ -15,7 +18,6 @@ const requestListener: http.RequestListener = async (
     if (req.method === "GET" && reg.test(String(req.url))){
         return userController.getUsersById(req, res)
     }
-    console.log(`METHOD: ${req.method} ${req.url}`)
 
 
     // TODO: refactorizar logica de response.
