@@ -14,6 +14,10 @@ const requestListener: http.RequestListener = async (
     if (req.method === "GET" && req.url === "/users/"){
         return userController.getUsers(req, res)
     }
+    if (req.method === "POST" && req.url === "/users/"){
+        return userController.createUser(req, res)
+    }
+
     const reg = /^\/users\/([a-fA-F0-9-]+)$/
     if (req.method === "GET" && reg.test(String(req.url))){
         return userController.getUsersById(req, res)
