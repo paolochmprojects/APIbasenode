@@ -1,5 +1,6 @@
 import http from "node:http"
 import userService, { UserService } from "./user.service"
+import { resp } from "../utils/response"
 
 export interface UserDTO {
     name: string
@@ -14,9 +15,7 @@ class UserController {
 
     async getUsers(_req: http.IncomingMessage, res: http.ServerResponse) {
         const users = await this.userService.getUsers()
-        res.writeHead(200, { "Content-Type": "application/json" })
-        res.write(JSON.stringify({ massage: "ok", data: users }))
-        res.end()
+        return resp(res, { massage: "ok", data: users },200)
     }
 
     async getUsersById(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -24,14 +23,9 @@ class UserController {
         const user = await this.userService.getUserById(String(id))
 
         if (typeof user === "string") {
-            res.writeHead(400, { "Content-Type": "application/json" })
-            res.write(JSON.stringify({ massage: user }))
-            res.end()
-            return
+            return resp(res, { massage: user }, 400)
         }
-        res.writeHead(200, { "Content-Type": "application/json" })
-        res.write(JSON.stringify({ massage: "ok", data: user }))
-        res.end()
+        return resp(res, { massage: "ok", data: user }, 200)
     }
 
     async createUser(req: http.IncomingMessage, res: http.ServerResponse) {
@@ -45,24 +39,16 @@ class UserController {
                 const jsonData = JSON.parse(data) as UserDTO;
                 const err = await this.userService.createUser(jsonData)
                 if (err === null) {
-                    res.writeHead(201, { "Content-Type": "application/json" })
-                    res.write(JSON.stringify({ message: "User se creo correctamente" }))
-                    res.end()
-                    return
+                    return resp(res, { message: "User se creo correctamente" }, 201)
                 }
-                res.writeHead(400, { "Content-Type": "application/json" })
-                res.write(JSON.stringify({ message: err }))
-                res.end()
-                return
+                return resp(res, { message: err }, 400)
 
 
             } catch (err) {
                 if (err instanceof Error) {
-                    res.writeHead(500, { "Content-Type": "application/json" })
-                    res.write(JSON.stringify({ message: `Error: ${err.message}` }))
-                    res.end()
-                    return
+                    return resp(res, { message: `Error: ${err.message}` }, 500)
                 }
+                return resp(res, { message: `Error` }, 500)
             }
         })
     }
@@ -81,24 +67,19 @@ class UserController {
                 const jsonData = JSON.parse(data) as UserDTO;
                 const err = await this.userService.updateUser(String(id), jsonData)
                 if (err === null) {
-                    res.writeHead(200, { "Content-Type": "application/json" })
-                    res.write(JSON.stringify({ message: "User se actualizo correctamente" }))
-                    res.end()
-                    return
+                    return resp(res, { message: "User se actualizo correctamente" }, 200)
                 }
                 res.writeHead(400, { "Content-Type": "application/json" })
                 res.write(JSON.stringify({ message: err }))
                 res.end()
-                return
+                return resp(res, { message: err }, 200)
 
 
             } catch (err) {
                 if (err instanceof Error) {
-                    res.writeHead(500, { "Content-Type": "application/json" })
-                    res.write(JSON.stringify({ message: `Error: ${err.message}` }))
-                    res.end()
-                    return
+                    return resp(res, { message: `Error: ${err.message}` }, 200)
                 }
+                return resp(res, { message: `Error` }, 200)
             }
         })
     }
@@ -108,16 +89,9 @@ class UserController {
         const err = await this.userService.deleteUser(String(id))
 
         if (err === null) {
-            res.writeHead(204, { "Content-Type": "application/json" })
-            res.write(JSON.stringify({ message: "User se elmino correctamente" }))
-            res.end()
-            return
+            return resp(res, { message: "User se elmino correctamente" }, 204)
         }
-        res.writeHead(400, { "Content-Type": "application/json" })
-        res.write(JSON.stringify({ message: err }))
-        res.end()
-        return
-
+        return resp(res, { message: err }, 400)
     }
 }
 

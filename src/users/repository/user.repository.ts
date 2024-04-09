@@ -13,7 +13,7 @@ export class UserRepository {
 
     async getUserById<T>(id:string):Promise<T>{
         const result = await this.client.query("SELECT * FROM users WHERE id = $1", [id])
-        if (result.rowCount === 0) throw new Error("Usser not found.")
+        if (result.rowCount === 0) throw new Error("User not found")
         return result.rows[0] as T
     }
 
