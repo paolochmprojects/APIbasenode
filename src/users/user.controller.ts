@@ -1,6 +1,5 @@
-import http from "node:http"
+import { Request, Response } from "express"
 import userService, { UserService } from "./user.service"
-import { resp } from "../utils/response"
 
 export interface UserDTO {
     name: string
@@ -13,85 +12,48 @@ class UserController {
 
     constructor(private userService: UserService) { }
 
-    async getUsers(_req: http.IncomingMessage, res: http.ServerResponse) {
+    async getUsers(_req: Request, res: Response) {
         const users = await this.userService.getUsers()
-        return resp(res, { massage: "ok", data: users },200)
+        return res.status(200).json({ massage: "ok", data: users })
     }
 
-    async getUsersById(req: http.IncomingMessage, res: http.ServerResponse) {
-        const id = String(req.url).split("/").pop()
+    async getUsersById(req: Request, res: Response) {
+        const { id } = req.params
         const user = await this.userService.getUserById(String(id))
-
         if (typeof user === "string") {
-            return resp(res, { massage: user }, 400)
+            return res.status(400).json({ massage: user })
         }
-        return resp(res, { massage: "ok", data: user }, 200)
+        return res.status(200).json({ massage: "ok", data: user })
     }
 
-    async createUser(req: http.IncomingMessage, res: http.ServerResponse) {
-        let data = ""
-        req.on("data", (chunk) => {
-            data += chunk
-        })
-
-        req.on("end", async () => {
-            try {
-                const jsonData = JSON.parse(data) as UserDTO;
-                const err = await this.userService.createUser(jsonData)
-                if (err === null) {
-                    return resp(res, { message: "User se creo correctamente" }, 201)
-                }
-                return resp(res, { message: err }, 400)
-
-
-            } catch (err) {
-                if (err instanceof Error) {
-                    return resp(res, { message: `Error: ${err.message}` }, 500)
-                }
-                return resp(res, { message: `Error` }, 500)
-            }
-        })
+    async createUser(req: Request, res: Response) {
+        const data = req.body
+        const err = await this.userService.createUser(data)
+        if (err === null) {
+            return res.status(201).json({ message: "User se creo correctamente" })
+        }
+        return res.status(400).json({ message: err })
     }
 
-    async updateUser (req: http.IncomingMessage, res: http.ServerResponse){
+    async updateUser(req: Request, res: Response) {
+        const { id } = req.params
+        const data = req.body
 
-        const id = String(req.url).split("/").pop()
-
-        let data = ""
-        req.on("data", (chunk) => {
-            data += chunk
-        })
-
-        req.on("end", async () => {
-            try {
-                const jsonData = JSON.parse(data) as UserDTO;
-                const err = await this.userService.updateUser(String(id), jsonData)
-                if (err === null) {
-                    return resp(res, { message: "User se actualizo correctamente" }, 200)
-                }
-                res.writeHead(400, { "Content-Type": "application/json" })
-                res.write(JSON.stringify({ message: err }))
-                res.end()
-                return resp(res, { message: err }, 200)
-
-
-            } catch (err) {
-                if (err instanceof Error) {
-                    return resp(res, { message: `Error: ${err.message}` }, 200)
-                }
-                return resp(res, { message: `Error` }, 200)
-            }
-        })
+        const err = await this.userService.updateUser(id, data)
+        if (err === null) {
+            return res.status(200).json({ message: "User se actualizo correctamente" })
+        }
+        return res.status(400).json({ message: err })
     }
 
-    async deleteUser(req: http.IncomingMessage, res: http.ServerResponse) {
-        const id = String(req.url).split("/").pop()
-        const err = await this.userService.deleteUser(String(id))
+    async deleteUser(req: Request, res: Response) {
+        const { id } = req.params
+        const err = await this.userService.deleteUser(id)
 
         if (err === null) {
-            return resp(res, { message: "User se elmino correctamente" }, 204)
+            return res.status(204).json({ message: "User se elmino correctamente" })
         }
-        return resp(res, { message: err }, 400)
+        return res.status(400).json({ message: err })
     }
 }
 

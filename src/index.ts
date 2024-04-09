@@ -1,49 +1,17 @@
-import http from "node:http"
-import settings from "./config/settings";
-import db from "./database/database";
-import userController from "./users/user.controller";
+import express from "express"
+import morgan from "morgan"
+import settings from "./config/settings"
+import database from "./database/database"
+import userRouter from "./users/user.router"
 
-const requestListener: http.RequestListener = async (
-    req: http.IncomingMessage, 
-    res: http.ServerResponse
-) => {
-    
-    console.log(`${req.method} ${new Date()} ${req.url}`)
-    
-    if (req.method === "GET" && req.url === "/users/"){
-        return await userController.getUsers(req, res)
-    }
-    if (req.method === "POST" && req.url === "/users/"){
-        return await userController.createUser(req, res)
-    }
+const app = express()
 
-    const reg = /^\/users\/([a-fA-F0-9-]+)$/
-    if (req.method === "GET" && reg.test(String(req.url))){
-        return await userController.getUsersById(req, res)
-    }
+app.use(express.json())
+app.use(morgan("dev"))
 
-    if (req.method === "PUT" && reg.test(String(req.url))){
-        return await userController.updateUser(req, res)
-    }
+app.use("/users", userRouter)
 
-    if ( req.method === "DELETE" && reg.test(String(req.url))){
-        return await userController.deleteUser(req, res)
-    }
-
-    res.writeHead(404,{ "Content-Type": "application/json" })
-    res.write(JSON.stringify({message:"Not Match " + req.url}))
-    res.end()
-};
-
-const server = http.createServer(requestListener);
-server.listen(settings.PORT, () => {
-    console.log("Server listen on port -> " + settings.PORT)
-});
-
-server.on("listening", async()=>{
-    await db.connect()
-})
-
-server.on("close", async()=>{
-    await db.disconnect()
+app.listen(settings.PORT, ()=>{
+    database.connect()
+    console.log(`Server runing in -> http://localhost:${settings.PORT}`)
 })
