@@ -1,10 +1,10 @@
-import { Client } from "pg";
+import { type Pool } from "pg";
 import db from "../../database/database";
 import { UserDTO } from "../user.controller";
 
 
 export class UserRepository {
-    constructor(private client: Client){}
+    constructor(private client: Pool){}
 
     async getUsers<T>():Promise<T[]>{
         const result = await this.client.query("SELECT * FROM users")
