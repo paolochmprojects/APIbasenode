@@ -1,6 +1,6 @@
 import { type Pool } from "pg";
 import db from "../../database/database";
-import { UserDTO } from "../user.controller";
+import { UserDTO } from "../dto/user.dto";
 
 
 export class UserRepository {
@@ -17,7 +17,7 @@ export class UserRepository {
         return result.rows[0] as T
     }
 
-    async createUser(data:UserDTO){
+    async createUser(data:UserDTO):Promise<string>{
         const result = await this.client.query(
             "INSERT INTO users (name, email, role, rate) VALUES ($1, $2, $3, $4) RETURNING id",
              [data.name, data.email, data.role, String(data.rate)])

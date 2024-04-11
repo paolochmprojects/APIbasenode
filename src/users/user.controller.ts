@@ -1,12 +1,6 @@
 import { Request, Response } from "express"
 import userService, { UserService } from "./user.service"
 
-export interface UserDTO {
-    name: string
-    email: string
-    role: string
-    rate: number
-}
 
 class UserController {
 
@@ -19,7 +13,7 @@ class UserController {
 
     async getUsersById(req: Request, res: Response) {
         const { id } = req.params
-        const user = await this.userService.getUserById(String(id))
+        const user = await this.userService.getUserById(id)
         if (typeof user === "string") {
             return res.status(400).json({ massage: user })
         }
@@ -28,11 +22,11 @@ class UserController {
 
     async createUser(req: Request, res: Response) {
         const data = req.body
-        const err = await this.userService.createUser(data)
-        if (err === null) {
-            return res.status(201).json({ message: "User se creo correctamente" })
+        const id = await this.userService.createUser(data)
+        if (id instanceof Error) {
+            return res.status(400).json({ message: id.message })
         }
-        return res.status(400).json({ message: err })
+        return res.status(201).json({ message: "User se creo correctamente" })
     }
 
     async updateUser(req: Request, res: Response) {

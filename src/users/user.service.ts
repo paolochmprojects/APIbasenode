@@ -1,11 +1,6 @@
+import { UserDTO } from "./dto/user.dto"
+import { User } from "./interface/user.interface"
 import userRepository, { UserRepository } from "./repository/user.repository"
-import { UserDTO } from "./user.controller"
-
-export interface User {
-    id: number
-    name: string
-    password: string
-}
 
 
 export class UserService {
@@ -13,25 +8,25 @@ export class UserService {
     constructor(private userRepository: UserRepository) { }
 
     async getUsers(): Promise<User[]> {
-        return await this.userRepository.getUsers()
+        return await this.userRepository.getUsers<User>()
     }
 
     async getUserById(id: string): Promise<User | string> {
         try {
-            return await this.userRepository.getUserById(id)
+            return await this.userRepository.getUserById<User>(id)
         } catch (err) {
             if (err instanceof Error) return err.message
             return "Ocurrio algo."
         }
     }
 
-    async createUser(data: UserDTO): Promise<string | null> {
+    async createUser(data: UserDTO): Promise<string | Error> {
         try {
-            await this.userRepository.createUser(data)
-            return null
+            const id = await this.userRepository.createUser(data)
+            return id
         } catch (err) {
-            if (err instanceof Error) return err.message
-            return "Ocurrio algo."
+            if (err instanceof Error) return err
+            return new Error("Unexpected error createUser()")
         }
     }
 
