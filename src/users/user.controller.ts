@@ -26,28 +26,28 @@ class UserController {
         if (id instanceof Error) {
             return res.status(400).json({ message: id.message })
         }
-        return res.status(201).json({ message: "User se creo correctamente" })
+        return res.status(201).json({ message: `User ${id} se creo correctamente` })
     }
 
     async updateUser(req: Request, res: Response) {
         const { id } = req.params
         const data = req.body
 
-        const err = await this.userService.updateUser(id, data)
-        if (err === null) {
-            return res.status(200).json({ message: "User se actualizo correctamente" })
+        const idEdited = await this.userService.updateUser(id, data)
+        if (idEdited instanceof Error) {
+            return res.status(400).json({ message: idEdited.message })
         }
-        return res.status(400).json({ message: err })
+        return res.status(200).json({ message: `User ${id} se actualizo correctamente` })
     }
 
     async deleteUser(req: Request, res: Response) {
         const { id } = req.params
         const err = await this.userService.deleteUser(id)
 
-        if (err === null) {
-            return res.status(204).json({ message: "User se elmino correctamente" })
+        if (err instanceof Error) {
+            return res.status(400).json({ message: err.message })
         }
-        return res.status(400).json({ message: err })
+        return res.status(204).json({ message: "User se elmino correctamente" })
     }
 }
 

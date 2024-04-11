@@ -1,5 +1,5 @@
 import { UserDTO } from "./dto/user.dto"
-import { User } from "./interface/user.interface"
+import { User } from "./entity/user.interface"
 import userRepository, { UserRepository } from "./repository/user.repository"
 
 
@@ -30,23 +30,21 @@ export class UserService {
         }
     }
 
-    async updateUser(id: string, data: UserDTO) {
+    async updateUser(id: string, data: UserDTO): Promise<string | Error> {
         try {
-            await this.userRepository.updateUser(id, data)
-            return null
+            return await this.userRepository.updateUser(id, data)
         } catch (err) {
-            if (err instanceof Error) return err.message
-            return "Ocurrio algo."
+            if (err instanceof Error) return err
+            return new Error("Unexpected error updateUser()")
         }
     }
 
-    async deleteUser(id: string) {
+    async deleteUser(id: string): Promise<string | Error> {
         try {
-            await this.userRepository.deleteUser(id)
-            return null
+            return await this.userRepository.deleteUser(id)
         } catch (err) {
-            if (err instanceof Error) return err.message
-            return "Ocurrio algo."
+            if (err instanceof Error) return err
+            return new Error("Unexpected error deleteUser()")
         }
     }
 }
